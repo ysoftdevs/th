@@ -8,3 +8,5 @@ Presenters:
 Jiri Matela, Co-founder & CEO, Comprimato
 
 Martin Jirman, Co-founder & CTO, Comprimato
+
+Presentation can be found at [https://speakerdeck.com/ysoftdevs/y-soft-technology-hour-ultimate-commodity-supercomputer](https://speakerdeck.com/ysoftdevs/y-soft-technology-hour-ultimate-commodity-supercomputer).
