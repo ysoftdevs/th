@@ -1,0 +1,309 @@
+<!-- Copyright 2014 Bodil Stokke <bodil@bodil.org>
+   -
+   - This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Reactive Game Development For The Discerning Hipster</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <style type="text/css">
+      body { visibility: hidden; background: black; }
+    </style>
+    <!-- <script type="text/javascript"> -->
+    <!--   var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-332358-13']); _gaq.push(['_setDomainName', 'bodil.org']); _gaq.push(['_trackPageview']); -->
+    <!--   (function() { -->
+    <!--   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; -->
+    <!--   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; -->
+    <!--   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); -->
+    <!--   })(); -->
+    <!-- </script> -->
+  </head>
+  <body>
+
+    <div id="slides" data-background="m/glasses.jpg">
+
+      <section data-image="m/have-fixie-will-hip.jpg" class="white photo">
+        <h3>REACTIVE GAME DEVELOPMENT</h3>
+        <h4>for the</h4>
+        <h2>DISCERNING HIPSTER</h2>
+        <h4 class="attribution">@bodil</h4>
+      </section>
+
+      <section data-image="m/steve.jpg" class="photo">
+      </section>
+
+      <section data-image="m/beard-off.jpg" class="white photo">
+        <h6>kleisli arrows</h6>
+        <h6>yoneda lemma</h6>
+        <h6>cofree coburritos</h6>
+        <h6>zygohistomorphic prepromorphisms</h6>
+      </section>
+
+      <section data-image="m/joe.jpg" class="white photo align-bottom erlang-the-movie">
+        <p>FUNCTIONAL REACTIVE PROGRAMMING</p>
+        <h2>NOW!</h2>
+      </section>
+
+      <section data-image="m/erik.jpg" class="photo white align-bottom">
+        <h1>Reactive Extensions</h1>
+      </section>
+
+      <section data-image="m/dhh.jpg" class="photo white align-bottom">
+        <h1>RxJS</h1>
+      </section>
+
+      <section data-image="m/dhh-racer.jpg" class="photo white align-bottom">
+        <h1>React.JS</h1>
+      </section>
+
+      <section data-editor="text/javascript" data-href="game/rxtut/rx.html">
+        var ponies = Rx.Observable.fromArray([
+          "Fluttershy",
+          "Twilight Sparkle",
+          "Applejack",
+          "Rarity",
+          "Rainbow Dash",
+          "Pinkie Pie"
+        ]);
+      </section>
+
+      <section data-editor="text/javascript" data-href="game/rxtut/rx.html">
+        var ponies = Rx.Observable.fromArray([
+          "Fluttershy",
+          "Twilight Sparkle",
+          "Applejack",
+          "Rarity",
+          "Rainbow Dash",
+          "Pinkie Pie"
+        ]);
+
+        var ponyTime = Rx.Observable.zip(
+          Rx.Observable.interval(500),
+          ponies, (tick, i) => i
+        ).log();
+
+        // ponyTime
+        // .filter((pony) => /e$/.test(pony))
+        // .map((pony) => "I love " + pony)
+        // .log();
+      </section>
+
+      <section data-editor="text/javascript" data-href="game/game.html" data-reload>
+const canvas = document.getElementById("canvas");
+
+function extend(target, obj) {
+  for (let prop in obj) target[prop] = obj[prop];
+}
+
+function assoc() {
+  let out = {};
+  for (let i = 0; i < arguments.length; i++)
+    extend(out, arguments[i]);
+  return out;
+}
+
+function onscreen(node) {
+  return !(node.x < -300 || node.y < -1000 || node.y > 1000);
+}
+
+function bindKey(key) {
+  let sub = new Rx.Subject();
+  Mousetrap.bind(key, () => {
+    sub.onNext(key);
+  });
+  return sub;
+}
+</section>
+
+      <section data-editor="text/javascript" data-href="game/game.html" data-reload>
+const canvas = document.getElementById("canvas");
+
+function extend(target, obj) {
+  for (let prop in obj) target[prop] = obj[prop];
+}
+
+function assoc() {
+  let out = {};
+  for (let i = 0; i < arguments.length; i++)
+    extend(out, arguments[i]);
+  return out;
+}
+
+function onscreen(node) {
+  return !(node.x < -300 || node.y < -1000 || node.y > 1000);
+}
+
+function bindKey(key) {
+  let sub = new Rx.Subject();
+  Mousetrap.bind(key, () => {
+    sub.onNext(key);
+  });
+  return sub;
+}
+
+function makeElement(node) {
+  return React.DOM.div({
+    className: node.id,
+    style: {
+      left: (node.x + (node.baseX || 0)) | 0 + "px",
+      top: (node.y + (node.baseY || 0)) | 0 + "px"
+    }
+  });
+}
+
+function renderScene(nodes) {
+  return React.renderComponent(
+    React.DOM.div(null, nodes.map(makeElement)),
+    canvas
+  );
+}
+
+let groundStream = Rx.Observable.interval(33)
+      .map((x) => ({
+	id: "ground",
+	baseX: -128,
+	x: ((x % 64) * -8), y: 384
+      }));
+
+function velocity(node) {
+  return assoc(node, {
+    x: node.x + node.vx,
+    y: node.y + node.vy
+  });
+}
+
+let tick = bindKey("space")
+      .buffer(Rx.Observable.interval(33));
+
+let initialHater = {
+  id: "hater",
+  vx: -8, vy: 0,
+  x: 1600, y: 300
+};
+
+let haterStream = tick.scan(initialHater, (c, keys) => {
+  // Apply velocity to position.
+  c = velocity(c);
+  return onscreen(c) ? c : initialHater;
+});
+
+let pinkieStream = Rx.Observable.zipArray(tick, haterStream).scan({
+  id: "pinkie",
+  baseY: 276,
+  x: 0, y: 0,
+  vx: 0, vy: 0,
+  gameOver: false
+}, (p, [keys, hater]) => {
+  p = velocity(p);
+
+  if (intersects(p, hater) && !p.gameOver) {
+    p.gameOver = true;
+    p.id = "pinkie gameover";
+    new Audio("sfx/gameover.mp3").play();
+    p.vy = -15;
+  }
+  if (p.gameOver) {
+    p.vy += 0.5;
+    return p;
+  }
+
+  // Apply gravity to Pinkie's velocity.
+  p.vy += 0.98;
+
+  // AS Pinkie Pie,
+  // GIVEN that I'm falling
+  // WHEN I hit the ground
+  // THEN I stop.
+  if (p.y >= 0 && p.vy > 0) {
+    p.y = 0; p.vy = 0;
+  }
+
+  // If Pinkie is on the ground and space has been pressed, JUMP.
+  if (keys[0] === "space") {
+    // p.vy = -20; // wheeee infinite jump
+    if (p.y === 0) {
+      p.vy = -20;
+      new Audio("sfx/jump.mp3").play();
+    }
+  }
+
+  p.id = (p.y < 0) ? "pinkie jumping" : "pinkie";
+
+  return p;
+}).takeWhile(onscreen);
+
+let initialCoin = {
+  id: "coin",
+  vx: -6, vy: 0,
+  x: 1600, y: 40
+};
+
+let coinStream = pinkieStream.scan(initialCoin, (c, pinkie) => {
+  // Apply velocity to position.
+  c = velocity(c);
+
+  // If Pinkie touches the coin, ding it!
+  if (c.vy === 0 && intersects(c, pinkie)) {
+    new Audio("sfx/coin.mp3").play();
+    c.vx = 0; c.vy = -1;
+  }
+  if (c.vy < 0) {
+    c.vy = c.vy * 2;
+  }
+
+  return onscreen(c) ? c : initialCoin;
+});
+
+Rx.Observable.zipArray(pinkieStream, groundStream, coinStream, haterStream)
+  .subscribe(renderScene);
+      </section>
+
+      <section data-image="m/bad-doge.jpg" class="white">
+        <h1>RxJS</h1>
+        <p><a style="font-size: 0.9em" href="http://reactive-extensions.github.io/RxJS/">http://reactive-extensions.github.io/RxJS/</a></p>
+      </section>
+
+      <section data-image="m/mad-doge.jpg" class="white">
+        <h1>Bacon.js</h1>
+        <p><a style="font-size: 0.9em" href="http://baconjs.github.io/">http://baconjs.github.io/</a></p>
+      </section>
+
+      <section data-image="m/doge.gif" class="white">
+        <h1>Elm</h1>
+        <p><a style="font-size: 0.9em" href="http://elm-lang.org/">http://elm-lang.org/</a></p>
+      </section>
+
+      <section data-background="m/muchmine.gif" class="white" style="text-align: center; background: rgba(0,0,0,0)">
+        <!-- <h3 style="margin: 0">谢谢!</h3> -->
+        <h3 style="margin-top: 0; margin-bottom: 1em">Thank you!</h3>
+        <!-- <h3 style="margin-top: 0; margin-bottom: 1em">qatlho'!</h3> -->
+        <p>@bodil</p>
+        <p style="font-size: 0.8em">
+          <a style="text-decoration: none" href="http://bodil.org/boogaloo/">bodil.org/boogaloo/</a>
+        </p>
+        <div style="position: absolute; left: 0.5em; bottom: 0.5em"
+             class="doge-widget-wrapper">
+          <form method='get' action='https://www.dogeapi.com/checkout'>
+            <input type='hidden' name='widget_type' value='donate'>
+            <input type='hidden' name='payment_address' value='D99Ayqb1Q9nm5bzpvmDpc34CsrxYWyjL1b'>
+            <div class='doge-widget' style='display:none;'></div>
+          </form>
+        </div>
+      </section>
+
+      <section data-background="m/moby-dick.jpg" class="photo white">
+        <h3>QUESTIONS?</h3>
+      </section>
+
+    </div>
+
+    <script type="text/javascript" src="build/slide.js"></script>
+    <!-- <script async src="https://www.dogeapi.com/widget/dogeapi.js" type="text/javascript"></script> -->
+  </body>
+</html>
